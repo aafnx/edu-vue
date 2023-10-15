@@ -5,44 +5,127 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Homework 1</title>
+    <title>Homework 2</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <style>
+        .sort {
+            margin: 50px auto;
+            text-align: center;
+        }
+        .sort__btn {
+            cursor: pointer;
+            padding: 15px;
+            border-radius: 20px;
+            outline: none;
+            border: none;
+        }
+        .products {
+            display: grid;
+            grid-template: auto / repeat(3, 380px);
+            gap: 30px;
+            justify-content: center;
+        }
+        .product-card {
+            border: 1px solid #000;
+            border-radius: 20px;
+            padding: 20px;
+            background-color: grey;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .product-card__title  {
+            text-align: center;
+            color: #fff;
+        }
+        .product-card__price {
+            color: aqua;
+            font-size: 24px;
+        }
+    </style>
 </head>
 <body>
 
 <div id="app">
-<!--    1. Создать кнопку "Перевернуть". При клике на кнопку текст кнопки должен перевернуться и отобразиться в обратном порядке.-->
-    <button @click="reverseBtnText">{{ btnText }}</button>
-
-
-<!--    2. Есть список элементов. Пользователь может добавлять новые элементы списка с текстом “Новый элемент списка”
-        нажав на кнопку "Добавить".-->
-<!--    3. *Дополнительное задание: При клике на элемент списка он должен быть удален. (по желанию)-->
-    <div>
-        <ul>
-            <li v-for="(el, idx) in elements" :key="idx" @click="rmElFromList(idx)">{{ el }}</li>
-        </ul>
-        <button @click="addElToList">Добавить элемент списка</button>
+    <div class="sort">
+        <p>Сортировка</p>
+        <button class="sort__btn" @click="sorting(0)">По умолчанию</button>
+        <button class="sort__btn" @click="sorting(-1)">По убыванию цены</button>
+        <button class="sort__btn" @click="sorting(1)">По возрастанию цены</button>
     </div>
+    <div class="products">
+        <article class="product-card" v-for="({title, price, img}, index) in sortedProducts" :key="index">
+            <img :src="img" :alt="title" class="product-card__img">
+            <h3 class="product-card__title">{{ title }}</h3>
+            <p class="product-card__price">{{ price }} rub</p>
+        </article>
+    </div>
+
 </div>
 
 <script>
+//    Вы разрабатываете приложение для отображения и сортировки списка товаров. У вас есть массив объектов `products`,
+//    где каждый объект представляет товар с его названием и ценой. Вам необходимо отобразить список товаров и
+//    предоставить пользователю возможность сортировать товары по цене (по возрастанию и по убыванию).
     new Vue({
         el: '#app',
         data: {
-            btnText: 'Hello Vue!',
-            elements: [ 'Элемент 1', 'Элемент 2', 'Элемент 3', 'Элемент 4']
+            products: [
+                {
+                    title: "Mockup cap",
+                    price: 1200,
+                    img: "https://img.freepik.com/free-psd/cap-mockup_1310-495.jpg?w=1800&t=st=1697355286~exp=1697355886~hmac=b67ebd757a0c9e72611804342882f03e73e74b1c88b1a544ad663a07daa8073b"
+                },
+                {
+                    title: "Mockup smart tv",
+                    price: 49000,
+                    img: "https://img.freepik.com/free-psd/smart-tv-mock-up-isolated_1310-1186.jpg?t=st=1697299323~exp=1697299923~hmac=9ae01597604424c3eef130e515c458811a9d2d610023c308c16ad8967450413c"
+                },
+                {
+                    title: "Mockup laptop",
+                    price: 130000,
+                    img: "https://img.freepik.com/free-psd/laptop-mock-up_1310-197.jpg"
+                },
+                {
+                    title: "Mockup tablet",
+                    price: 78000,
+                    img: "https://img.freepik.com/premium-psd/colorful-digital-tablet-screen-mockup-lean-wall_53876-98664.jpg"
+                },
+                {
+                    title: "Mockup phone",
+                    price: 100000,
+                    img: "https://img.freepik.com/premium-psd/colorful-mobile-phone-mockup_196070-192.jpg"
+                },
+                {
+                    title: "Mockup pizza",
+                    price: 600,
+                    img: "https://img.freepik.com/premium-psd/pizza-box-mockup-with-changeable-color_196070-346.jpg"
+                }
+            ],
+            sortType: 0,
         },
         methods: {
-            reverseBtnText() {
-                this.btnText = this.btnText.split('').reverse().join('');
-            },
-            addElToList() {
-                const newElIndex = Number(this.elements[this.elements.length - 1].split(' ')[1]) + 1;
-                this.elements.push(`Элемент ${newElIndex}`);
-            },
-            rmElFromList(index) {
-                this.elements.splice(index, 1);
+            // n - число
+            // если > 0 — сортировка по возрастанию
+            // если < 0 — сортировка по убывнию
+            // если === 0 — сортировка по умолчанию
+            sorting(n) {
+                this.sortType = 0;
+                this.sortType += n;
+            }
+        },
+        computed: {
+            sortedProducts() {
+                // by ascending
+                if (this.sortType > 0) {
+                    return [...this.products].sort((product1, product2) => product1.price - product2.price)
+                }
+                // by descending
+                if (this.sortType < 0) {
+                    return [...this.products].sort((product1, product2) => product2.price - product1.price)
+                }
+                // default
+                return [...this.products]
             }
         }
     })
